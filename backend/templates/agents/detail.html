@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ agent.name }} - Special Agents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="agent-detail">
+        <div class="agent-header">
+            <h1>{{ agent.name }}</h1>
+            <span class="agent-category-badge">{{ agent.category }}</span>
+        </div>
+
+        <div class="agent-info">
+            <div class="agent-stats">
+                <span class="stat">⭐ {{ agent.average_rating }}/5</span>
+                <span class="stat">{{ agent.purchase_count }} purchases</span>
+                <span class="stat">by {{ agent.creator.username }}</span>
+            </div>
+
+            <div class="agent-description">
+                <h2>Description</h2>
+                <p>{{ agent.description }}</p>
+            </div>
+
+            <div class="agent-pricing">
+                <h3>Price: {{ agent.currency }} {{ agent.price }}</h3>
+                {% if current_user.is_authenticated %}
+                    {% if has_purchased %}
+                        <a href="{{ url_for('chat.agent_chat', agent_id=agent.id) }}" class="btn btn-primary">Chat with Agent</a>
+                        <p class="purchased-badge">You own this agent</p>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('agents.purchase', agent_id=agent.id) }}">
+                            <button type="submit" class="btn btn-primary">Purchase Agent</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p><a href="{{ url_for('auth.login') }}">Login</a> to purchase this agent</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="agent-reviews">
+            <h2>Reviews</h2>
+
+            {% if current_user.is_authenticated and has_purchased %}
+                <div class="review-form">
+                    <h3>Leave a Review</h3>
+                    <form method="POST" action="{{ url_for('agents.add_review', agent_id=agent.id) }}">
+                        <div class="form-group">
+                            <label for="rating">Rating (1-5 stars)</label>
+                            <select id="rating" name="rating" required>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Good</option>
+                                <option value="3">3 - Average</option>
+                                <option value="2">2 - Poor</option>
+                                <option value="1">1 - Very Poor</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <textarea id="comment" name="comment" rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary">Submit Review</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <div class="reviews-list">
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review">
+                            <div class="review-header">
+                                <span class="reviewer">{{ review.reviewer.username }}</span>
+                                <span class="rating">{{ '⭐' * review.rating }}</span>
+                                <span class="review-date">{{ review.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            {% if review.comment %}
+                                <p class="review-comment">{{ review.comment }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews yet. Be the first to review this agent!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

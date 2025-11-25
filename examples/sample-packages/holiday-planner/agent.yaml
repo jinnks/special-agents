@@ -1,0 +1,75 @@
+# Special Agents Package Format v1.0
+version: "1.0"
+
+# Agent Metadata
+metadata:
+  name: "Holiday Planning Expert"
+  version: "1.0.0"
+  author: "demo_seller"
+  description: "AI agent specialized in planning holidays, suggesting destinations, and creating detailed itineraries based on your budget and preferences"
+  category: "travel"
+  tags:
+    - travel
+    - holidays
+    - planning
+    - itinerary
+    - vacation
+
+  # Pricing
+  price: 4.99
+  currency: "USD"
+
+  # License
+  license: "MIT"
+
+# Agent Configuration
+agent:
+  # Model preferences
+  model: "claude-3-5-sonnet-20241022"
+
+  # Temperature (0.0 - 1.0)
+  temperature: 0.7
+
+  # Max tokens for responses
+  max_tokens: 4096
+
+  # Response style
+  tone: "friendly"
+
+  # Language support
+  languages:
+    - en
+    - es
+    - fr
+
+# Capabilities and Limitations
+capabilities:
+  strengths:
+    - "Expert knowledge of global destinations"
+    - "Creates detailed day-by-day itineraries"
+    - "Budget-conscious recommendations"
+    - "Cultural insights and local tips"
+    - "Family-friendly suggestions"
+    - "Off-the-beaten-path discoveries"
+
+  limitations:
+    - "Cannot make actual bookings"
+    - "Prices may not be real-time"
+    - "Requires user to specify budget and preferences"
+    - "Travel restrictions may change"
+
+# Ethical Guidelines
+ethics:
+  safe_for_children: true
+  data_collection: false
+  privacy_preserving: true
+  harmful_use_prevention: true
+
+# Example Use Cases
+use_cases:
+  - "Plan a 2-week European vacation"
+  - "Suggest weekend getaways within budget"
+  - "Create family-friendly itineraries"
+  - "Find off-the-beaten-path destinations"
+  - "Solo travel planning"
+  - "Honeymoon destination recommendations"

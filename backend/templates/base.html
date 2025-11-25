@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Special Agents - Ethical AI Marketplace{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('main.index') }}" class="logo">Special Agents</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('agents.marketplace') }}">Marketplace</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('agents.my_purchases') }}">My Agents</a></li>
+                    {% if current_user.is_seller %}
+                        <li><a href="{{ url_for('agents.my_agents') }}">My Created Agents</a></li>
+                        <li><a href="{{ url_for('agents.upload_package') }}">Upload Package</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Special Agents - Ethical AI Marketplace</p>
+            <p>Built with Anthropic Claude | <a href="{{ url_for('main.about') }}">About</a></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

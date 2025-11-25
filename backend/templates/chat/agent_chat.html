@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Chat with {{ agent.name }} - Special Agents{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .chat-header {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .chat-messages {
+        height: 500px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: white;
+    }
+
+    .message {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message.user {
+        align-items: flex-end;
+    }
+
+    .message.assistant {
+        align-items: flex-start;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .message.user .message-content {
+        background: #007bff;
+        color: white;
+    }
+
+    .message.assistant .message-content {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .message-label {
+        font-size: 0.85em;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .chat-input-area {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input-area textarea {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        resize: vertical;
+        min-height: 60px;
+        font-family: inherit;
+    }
+
+    .chat-input-area button {
+        align-self: flex-end;
+    }
+
+    .chat-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 10px;
+        color: #666;
+    }
+
+    .loading.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h1>{{ agent.name }}</h1>
+        <p>{{ agent.description }}</p>
+    </div>
+
+    <div class="chat-actions">
+        <button id="clearChat" class="btn btn-secondary">Clear Chat</button>
+        <a href="{{ url_for('agents.detail', agent_id=agent.id) }}" class="btn btn-outline">Back to Agent</a>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <!-- Messages will be added here dynamically -->
+    </div>
+
+    <div class="loading" id="loadingIndicator">
+        <p>Agent is thinking...</p>
+    </div>
+
+    <div class="chat-input-area">
+        <textarea id="messageInput" placeholder="Type your message here..." rows="3"></textarea>
+        <button id="sendMessage" class="btn btn-primary">Send</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const agentId = {{ agent.id }};
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendMessage');
+    const clearButton = document.getElementById('clearChat');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+
+    // Add message to chat
+    function addMessage(role, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+
+        const label = document.createElement('div');
+        label.className = 'message-label';
+        label.textContent = role === 'user' ? 'You' : '{{ agent.name }}';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = content;
+
+        messageDiv.appendChild(label);
+        messageDiv.appendChild(contentDiv);
+        chatMessages.appendChild(messageDiv);
+
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Send message
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add user message to chat
+        addMessage('user', message);
+        messageInput.value = '';
+        sendButton.disabled = true;
+        loadingIndicator.classList.add('active');
+
+        try {
+            const response = await fetch(`/chat/agent/${agentId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                addMessage('assistant', data.response);
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Failed to send message: ' + error);
+        } finally {
+            sendButton.disabled = false;
+            loadingIndicator.classList.remove('active');
+        }
+    }
+
+    // Clear chat
+    async function clearChat() {
+        if (!confirm('Are you sure you want to clear the conversation history?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/chat/agent/${agentId}/clear`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                chatMessages.innerHTML = '';
+            } else {
+                alert('Failed to clear chat');
+            }
+        } catch (error) {
+            alert('Failed to clear chat: ' + error);
+        }
+    }
+
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    clearButton.addEventListener('click', clearChat);
+
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Add welcome message
+    addMessage('assistant', `Hello! I'm ${document.querySelector('.chat-header h1').textContent}. How can I help you today?`);
+</script>
+{% endblock %}

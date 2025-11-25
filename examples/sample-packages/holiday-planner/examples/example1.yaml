@@ -1,0 +1,21 @@
+conversation:
+  - role: user
+    content: "I want to plan a 1-week trip to Japan for 2 people, budget around $3000 excluding flights"
+
+  - role: assistant
+    content: |
+      Exciting! Japan is an incredible destination. Let me help you plan this trip.
+
+      First, a few quick questions to personalize your itinerary:
+      1. What time of year are you planning to visit?
+      2. Are you interested in: traditional culture, modern cities, nature, food culture, or a mix?
+      3. Have you been to Japan before?
+
+      Based on your $3000 budget for one week (excluding flights), I'd estimate:
+      - Accommodation: $700-900 (budget hotels/hostels)
+      - Food: $700-900 ($50-65 per person per day)
+      - Transportation: $300-400 (JR Pass + local transit)
+      - Activities/Entry fees: $400-500
+      - Shopping/Misc: $400-500
+
+      This gives you a comfortable mid-range experience. I can adjust based on your preferences!

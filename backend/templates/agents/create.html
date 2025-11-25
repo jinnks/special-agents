@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Create Agent - Special Agents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="create-agent-form">
+        <h1>Create New Agent</h1>
+        <p>Create a specialized AI agent to help users with specific tasks. All agents are reviewed for ethical compliance.</p>
+
+        <form method="POST" action="{{ url_for('agents.create') }}">
+            <div class="form-group">
+                <label for="name">Agent Name *</label>
+                <input type="text" id="name" name="name" required placeholder="e.g., Holiday Planning Expert">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <option value="productivity">Productivity</option>
+                    <option value="education">Education</option>
+                    <option value="travel">Travel</option>
+                    <option value="health">Health</option>
+                    <option value="finance">Finance</option>
+                    <option value="creative">Creative</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" rows="4" required placeholder="Describe what your agent does and how it helps users..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="system_prompt">System Prompt *</label>
+                <textarea id="system_prompt" name="system_prompt" rows="8" required placeholder="Enter the system prompt that defines your agent's behavior, expertise, and personality..."></textarea>
+                <small>This prompt defines your agent's capabilities and behavior. Be specific about what the agent should do and how it should help users.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price (USD) *</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" value="0" required>
+                <small>Set to 0 for a free agent</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Agent</button>
+        </form>
+
+        <div class="ethical-notice">
+            <h3>Ethical Guidelines</h3>
+            <p>All agents are reviewed to ensure they:</p>
+            <ul>
+                <li>Promote positive outcomes for users and society</li>
+                <li>Respect privacy, fairness, and human autonomy</li>
+                <li>Cannot be misused for harmful purposes</li>
+                <li>Align with ethical AI principles</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

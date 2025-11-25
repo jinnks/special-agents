@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}My Created Agents - Special Agents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="my-agents-header">
+        <h1>My Created Agents</h1>
+        <a href="{{ url_for('agents.create') }}" class="btn btn-primary">Create New Agent</a>
+    </div>
+
+    <div class="agent-list">
+        {% if agents %}
+            {% for agent in agents %}
+                <div class="agent-list-item">
+                    <div class="agent-list-info">
+                        <h3><a href="{{ url_for('agents.detail', agent_id=agent.id) }}">{{ agent.name }}</a></h3>
+                        <p class="agent-category">{{ agent.category }}</p>
+                        <p class="agent-description">{{ agent.description[:100] }}...</p>
+                        <div class="agent-stats">
+                            <span class="stat">⭐ {{ agent.average_rating }}/5</span>
+                            <span class="stat">{{ agent.purchase_count }} purchases</span>
+                            <span class="stat">{{ agent.currency }} {{ agent.price }}</span>
+                        </div>
+                    </div>
+                    <div class="agent-list-status">
+                        {% if agent.is_approved %}
+                            <span class="status-badge status-approved">Approved</span>
+                        {% else %}
+                            <span class="status-badge status-pending">Pending Review</span>
+                        {% endif %}
+
+                        {% if agent.is_active %}
+                            <span class="status-badge status-active">Active</span>
+                        {% else %}
+                            <span class="status-badge status-inactive">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">You haven't created any agents yet. <a href="{{ url_for('agents.create') }}">Create your first agent</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

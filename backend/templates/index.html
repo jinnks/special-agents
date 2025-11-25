@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1>Welcome to Special Agents</h1>
+        <p class="tagline">Discover specialized AI agents that bring positive change to humanity</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('agents.marketplace') }}" class="btn btn-primary">Browse Agents</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="container">
+        <h2>Why Special Agents?</h2>
+        <div class="feature-grid">
+            <div class="feature">
+                <h3>Specialized Expertise</h3>
+                <p>Each agent is trained for specific tasks - from holiday planning to math assistance</p>
+            </div>
+            <div class="feature">
+                <h3>Ethical AI</h3>
+                <p>All agents are reviewed to ensure they promote positive outcomes for humanity</p>
+            </div>
+            <div class="feature">
+                <h3>Easy to Use</h3>
+                <p>Purchase once, chat unlimited with your specialized AI agents</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popular-agents">
+    <div class="container">
+        <h2>Popular Agents</h2>
+        <p>Explore some of our most loved AI agents</p>
+        <a href="{{ url_for('agents.marketplace') }}" class="btn btn-outline">View All Agents</a>
+    </div>
+</div>
+{% endblock %}

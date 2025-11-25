@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Marketplace - Special Agents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="marketplace-header">
+        <h1>AI Agent Marketplace</h1>
+        <p>Discover specialized AI agents for your needs</p>
+    </div>
+
+    <div class="marketplace-filters">
+        <form method="GET" action="{{ url_for('agents.marketplace') }}">
+            <input type="text" name="search" placeholder="Search agents..." value="{{ request.args.get('search', '') }}">
+            <select name="category">
+                <option value="">All Categories</option>
+                <option value="productivity" {% if request.args.get('category') == 'productivity' %}selected{% endif %}>Productivity</option>
+                <option value="education" {% if request.args.get('category') == 'education' %}selected{% endif %}>Education</option>
+                <option value="travel" {% if request.args.get('category') == 'travel' %}selected{% endif %}>Travel</option>
+                <option value="health" {% if request.args.get('category') == 'health' %}selected{% endif %}>Health</option>
+                <option value="finance" {% if request.args.get('category') == 'finance' %}selected{% endif %}>Finance</option>
+                <option value="creative" {% if request.args.get('category') == 'creative' %}selected{% endif %}>Creative</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filter</button>
+        </form>
+    </div>
+
+    <div class="agent-grid">
+        {% if agents %}
+            {% for agent in agents %}
+                <div class="agent-card">
+                    <h3><a href="{{ url_for('agents.detail', agent_id=agent.id) }}">{{ agent.name }}</a></h3>
+                    <p class="agent-category">{{ agent.category }}</p>
+                    <p class="agent-description">{{ agent.description[:150] }}{% if agent.description|length > 150 %}...{% endif %}</p>
+                    <div class="agent-meta">
+                        <span class="agent-price">{{ agent.currency }} {{ agent.price }}</span>
+                        <span class="agent-rating">⭐ {{ agent.average_rating }}/5</span>
+                        <span class="agent-purchases">{{ agent.purchase_count }} purchases</span>
+                    </div>
+                    <p class="agent-creator">by {{ agent.creator.username }}</p>
+                    <a href="{{ url_for('agents.detail', agent_id=agent.id) }}" class="btn btn-outline">View Details</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">No agents found. Try adjusting your filters.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

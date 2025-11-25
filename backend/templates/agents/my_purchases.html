@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}My Agents - Special Agents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>My Purchased Agents</h1>
+
+    <div class="agent-list">
+        {% if purchases %}
+            {% for purchase in purchases %}
+                <div class="agent-list-item">
+                    <div class="agent-list-info">
+                        <h3><a href="{{ url_for('agents.detail', agent_id=purchase.agent.id) }}">{{ purchase.agent.name }}</a></h3>
+                        <p class="agent-category">{{ purchase.agent.category }}</p>
+                        <p class="agent-description">{{ purchase.agent.description[:100] }}...</p>
+                        <div class="agent-meta">
+                            <span>Purchased: {{ purchase.purchased_at.strftime('%Y-%m-%d') }}</span>
+                            <span>Paid: {{ purchase.currency }} {{ purchase.price_paid }}</span>
+                        </div>
+                    </div>
+                    <div class="agent-list-actions">
+                        <a href="{{ url_for('chat.agent_chat', agent_id=purchase.agent.id) }}" class="btn btn-primary">Chat</a>
+                        <a href="{{ url_for('agents.detail', agent_id=purchase.agent.id) }}" class="btn btn-outline">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">You haven't purchased any agents yet. <a href="{{ url_for('agents.marketplace') }}">Browse the marketplace</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
