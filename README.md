@@ -1,6 +1,36 @@
 # Special Agents - Ethical AI Marketplace
 
+<div align="center">
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg)
+![Flask](https://img.shields.io/badge/flask-3.0.0-green.svg)
+![Claude](https://img.shields.io/badge/claude-3.5%20sonnet-purple.svg)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Contributors](https://img.shields.io/github/contributors/jinnks/special-agents.svg)
+![Stars](https://img.shields.io/github/stars/jinnks/special-agents.svg)
+
+**The world's first standardized package format for AI agents**
+
+[Live Demo](http://localhost:5000) • [Documentation](AGENT_PACKAGE_SPEC.md) • [Roadmap](ROADMAP.md) • [Contributing](CONTRIBUTING.md)
+
+</div>
+
+---
+
+## 🎯 What is Special Agents?
+
 A marketplace for specialized AI agents that bring positive change to humanity. Built with Flask, gevent, and Anthropic Claude API.
+
+### 🚀 Key Innovation: The `.sagent` Package Format
+
+Special Agents introduces the **industry's first standardized package format** for AI agents - think npm for AI!
+
+**Why this matters:**
+- ❌ OpenAI GPTs are platform-locked
+- ❌ LangChain requires heavy coding
+- ❌ No portability between platforms
+- ✅ `.sagent` packages work anywhere!
 
 ## Features
 
