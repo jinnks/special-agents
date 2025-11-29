@@ -72,3 +72,16 @@ Thumbs.db
 *.swp
 tmp/
 temp/
+
+# Business & Legal Documents (PRIVATE - Local only)
+BUSINESS_PLAN.md
+EQUITY_PLAN.md
+LAUNCH_POSTS.md
+MARKETING_STRATEGY.md
+LEGAL_FRAMEWORK.md
+SECURITY_POLICY.md
+LAUNCH_EXECUTION.md
+PROJECT_STATUS.md
+TERMS_OF_SERVICE.md
+PRIVACY_POLICY.md
+add_copyright.py
