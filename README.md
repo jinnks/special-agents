@@ -22,6 +22,13 @@
 
 A marketplace for specialized AI agents that bring positive change to humanity. Built with Flask, gevent, and Anthropic Claude API.
 
+**Our Commitments:**
+- 🔒 **Security First** - No compromises on user data protection and platform security
+- ⚖️ **Legal Protection** - Proper legal framework protecting users, contributors, and the business
+- 🎯 **Project First** - Every decision prioritizes Special Agents' long-term success
+- 🤝 **Ethical AI** - All agents reviewed for positive societal impact
+- 💪 **Flexible & Positive** - Adapt to challenges, always move forward
+
 ### 🚀 Key Innovation: The `.sagent` Package Format
 
 Special Agents introduces the **industry's first standardized package format** for AI agents - think npm for AI!
@@ -276,9 +283,27 @@ python3 -m zipfile -c my-agent.sagent .
 - Docker deployment
 - Agent marketplace API
 
+## 🔒 Security & Legal
+
+**Security Policy:** See [SECURITY_POLICY.md](SECURITY_POLICY.md)
+- No compromises on security
+- Proactive vulnerability management
+- Transparent incident response
+- Bug bounty program (when funded)
+
+**Legal Framework:** See [LEGAL_FRAMEWORK.md](LEGAL_FRAMEWORK.md)
+- Proper business structure
+- IP protection
+- Contributor agreements
+- Compliance (GDPR, CCPA)
+
+**Report Security Issues:** security@special-agents.ai (to be set up)
+
 ## License
 
-MIT License
+MIT License - See [LICENSE](LICENSE) for details
+
+Copyright (c) 2025 Special Agents
 
 ## Credits
 

@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Special Agents
+# Licensed under MIT License - See LICENSE file for details
+
 """
 Special Agents Package (.sagent) handler
 Validates, extracts, and processes agent packages

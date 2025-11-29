@@ -1,6 +1,9 @@
 """
 Special Agents - Ethical AI Agents Marketplace
 Built with Flask + gevent for async handling
+
+Copyright (c) 2025 Special Agents
+Licensed under MIT License - See LICENSE file for details
 """
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy

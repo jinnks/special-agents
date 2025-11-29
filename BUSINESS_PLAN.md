@@ -319,37 +319,32 @@ Interested in learning more? 30-min call?
 
 ### Immediate Decisions (This Week):
 
-**1. Equity Structure**
-- **Proposal:** Reserve 20% for contributors (10% for top 10, 10% for advisors)
-- **Your stake:** 80%
-- **Approval needed?**
+**1. Equity Structure** ✅ APPROVED
+- **Founder (You):** 60%
+- **CTO/Technical Co-Founder:** 20% (4-year vest, 1-year cliff)
+- **Early Contributors:** 15% (split among 10-15 developers, 1-2% each)
+- **Advisors/Future Pool:** 5%
+- **Total:** 100%
 
-**2. Revenue Share Model**
-- **Proposal:**
-  - Payment integration: 5% of revenue for 12 months
-  - Analytics system: 3% of premium tier revenue
-  - Security features: One-time bounties
-- **Approval needed?**
+**2. Revenue Share Model** ✅ APPROVED
+- Payment integration: 5% of revenue for 12 months
+- Analytics system: 3% of premium tier revenue
+- Security features: One-time bounties
 
-**3. Pricing Strategy**
-- **Proposal:**
-  - Commission: 30% (industry standard)
-  - Pro tier: $29/month
-  - Enterprise: $199/month
-- **Too high? Too low?**
+**3. Pricing Strategy** ✅ APPROVED
+- Commission: 30% (industry standard)
+- Pro tier: $29/month
+- Enterprise: $199/month
 
-**4. Payment Processor**
-- **Options:** Stripe (easy, 2.9% + 30¢), PayPal (known, higher fees), Paddle (handles tax)
-- **Recommendation:** Stripe
-- **Approval needed?**
+**4. Payment Processor** ✅ APPROVED
+- **Stripe** (2.9% + 30¢ per transaction)
+- Industry standard, excellent documentation
+- PCI compliance handled for us
 
-**5. Hosting Strategy**
-- **Options:**
-  - DigitalOcean ($50-200/month, simple)
-  - AWS (scalable, complex, $100-500/month)
-  - Heroku (easiest, $100-300/month)
-- **Recommendation:** DigitalOcean initially, AWS later
-- **Approval needed?**
+**5. Hosting Strategy** ✅ APPROVED
+- **DigitalOcean** initially ($50-100/month)
+- Budget: $70-170/month total (hosting + domain + tools)
+- Migrate to AWS when scaling beyond 10K users
 
 ---
 
