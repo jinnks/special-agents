@@ -15,34 +15,57 @@ This is a living document that grows with the business. All legal decisions prio
 
 ## 🏢 Business Structure
 
-### Current Structure
-**Entity Type:** Sole Proprietorship (Temporary)
-- Simple, no formation cost
-- Personal liability (will change)
-- Good for MVP/prototyping
+### Current Structure ✅
+**Entity Type:** UK Registered Company
+- ✅ Limited liability protection (already established)
+- ✅ Professional business entity
+- ✅ Ready for revenue and operations
+- ✅ Can issue equity/shares
+- ✅ International operations capable
 
-### Recommended Structure (Before Revenue)
-**Entity Type:** Delaware C-Corporation
+**Company Details:**
+- **Company Name:** HYF House LTD
+- **Company Number:** 14574630
+- **Jurisdiction:** United Kingdom (England and Wales)
+- **Status:** Active and registered
+- **Ready for:** Immediate revenue generation
 
-**Why C-Corp:**
+### Advantages of UK Company
+
+**For Special Agents:**
 ✅ Limited liability protection
-✅ Equity structure (stock options)
-✅ Investor-friendly (if we raise funding)
+✅ International credibility
+✅ Can operate globally
 ✅ Professional image
-✅ Tax advantages for growth
+✅ Tax-efficient structure
+✅ Easier EU market access
+✅ Strong IP protection laws
 
-**Timeline:**
-- **Before first dollar of revenue:** Form LLC
-- **Before $50K revenue:** Convert to C-Corp
-- **Before hiring:** C-Corp essential
+**For International Team:**
+✅ Can hire globally
+✅ Issue equity to international contributors
+✅ Accept payments worldwide
+✅ Stripe Atlas compatible
 
-**Formation Checklist:**
-- [ ] Register Delaware C-Corp (cost: ~$500)
-- [ ] Get EIN from IRS
-- [ ] Open business bank account
-- [ ] File 83(b) election for founder shares
-- [ ] Issue stock certificates
-- [ ] Adopt bylaws and operating agreement
+### Compliance Requirements
+
+**UK Company Requirements:**
+- [ ] Annual accounts filing (Companies House)
+- [ ] Corporation Tax return (HMRC)
+- [ ] Maintain registered office address
+- [ ] Keep statutory books updated
+- [ ] Annual confirmation statement
+- [ ] VAT registration (when threshold reached: £90,000)
+
+**US Operations:**
+- [ ] Consider US branch registration (if significant US revenue)
+- [ ] ITIN or EIN for US tax purposes (when needed)
+- [ ] State registrations (if needed for specific states)
+
+**Multi-Jurisdiction:**
+- [ ] GDPR compliance (UK/EU)
+- [ ] CCPA compliance (California users)
+- [ ] International tax considerations
 
 ---
 
