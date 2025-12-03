@@ -87,9 +87,21 @@ class AgentPackageValidator:
         """Validate the contents of extracted package."""
         metadata = {}
 
-        # Check required files
+        # Check required files - first at root, then in single subdirectory
         agent_yaml_path = os.path.join(package_dir, 'agent.yaml')
         system_prompt_path = os.path.join(package_dir, 'system_prompt.txt')
+
+        # If not at root, check for single top-level directory
+        if not os.path.exists(agent_yaml_path):
+            subdirs = [d for d in os.listdir(package_dir)
+                      if os.path.isdir(os.path.join(package_dir, d)) and not d.startswith('.')]
+            if len(subdirs) == 1:
+                # Try inside the single subdirectory
+                inner_dir = os.path.join(package_dir, subdirs[0])
+                agent_yaml_path = os.path.join(inner_dir, 'agent.yaml')
+                system_prompt_path = os.path.join(inner_dir, 'system_prompt.txt')
+                # Update package_dir to point to inner directory for subsequent checks
+                package_dir = inner_dir
 
         if not os.path.exists(agent_yaml_path):
             self.errors.append("Missing required file: agent.yaml")
@@ -310,6 +322,15 @@ class AgentPackageExtractor:
 
         if not os.path.exists(agent_dir):
             raise FileNotFoundError(f"Agent {agent_id} package not found")
+
+        # Check if files are in root or subdirectory
+        agent_yaml_path = os.path.join(agent_dir, 'agent.yaml')
+        if not os.path.exists(agent_yaml_path):
+            # Look for single subdirectory
+            subdirs = [d for d in os.listdir(agent_dir)
+                      if os.path.isdir(os.path.join(agent_dir, d)) and not d.startswith('.')]
+            if len(subdirs) == 1:
+                agent_dir = os.path.join(agent_dir, subdirs[0])
 
         data = {}
 
