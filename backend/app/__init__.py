@@ -16,6 +16,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from decouple import config
 from pythonjsonlogger import jsonlogger
+from sqlalchemy import text
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -99,7 +100,7 @@ def create_app():
         """Health check endpoint for monitoring and load balancers"""
         try:
             # Test database connection
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             db_status = 'healthy'
         except Exception as e:
             app.logger.error(f"Database health check failed: {str(e)}")
