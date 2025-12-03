@@ -14,11 +14,14 @@ logger = logging.getLogger(__name__)
 class ClaudeService:
     """Service for interacting with Anthropic Claude API."""
 
-    def __init__(self):
-        """Initialize Claude client with API key from config."""
-        self.api_key = current_app.config.get('ANTHROPIC_API_KEY')
-        if not self.api_key:
-            logger.warning("ANTHROPIC_API_KEY not configured")
+    def __init__(self, api_key=None):
+        """
+        Initialize Claude client with API key.
+
+        Args:
+            api_key: User's Anthropic API key. If not provided, uses platform key for validation only.
+        """
+        self.api_key = api_key or current_app.config.get('ANTHROPIC_API_KEY')
         self.client = anthropic.Anthropic(api_key=self.api_key) if self.api_key else None
 
     def chat_with_agent(self, system_prompt, conversation_history, user_message):
@@ -34,7 +37,7 @@ class ClaudeService:
             dict: {'response': str, 'model': str, 'usage': dict}
         """
         if not self.client:
-            raise Exception("Claude API key not configured. Please set ANTHROPIC_API_KEY in your environment.")
+            raise Exception("Please provide your Anthropic API key to chat with agents.")
 
         try:
             # Build messages list

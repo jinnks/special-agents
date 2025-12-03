@@ -63,20 +63,36 @@ def send_message(agent_id):
     if not has_purchased:
         return jsonify({'error': 'You must purchase this agent before chatting'}), 403
 
-    # Get message from request
+    # Get message and API key from request
     data = request.get_json()
     user_message = data.get('message')
+    anthropic_api_key = data.get('api_key')
 
     if not user_message:
         return jsonify({'error': 'Message is required'}), 400
+
+    # Determine which API key to use
+    api_key = None
+    if anthropic_api_key:
+        # User provided API key with this request
+        api_key = anthropic_api_key
+        # Only save to session if not already saved (first message)
+        if 'anthropic_api_key' not in session:
+            session['anthropic_api_key'] = anthropic_api_key
+    else:
+        # Try to get from session
+        api_key = session.get('anthropic_api_key')
+
+    if not api_key:
+        return jsonify({'error': 'Please provide your Anthropic API key', 'require_api_key': True}), 401
 
     # Get conversation history from session
     session_key = f'chat_history_{agent_id}'
     conversation_history = session.get(session_key, [])
 
     try:
-        # Call Claude API
-        claude_service = ClaudeService()
+        # Call Claude API with user's API key
+        claude_service = ClaudeService(api_key=api_key)
         result = claude_service.chat_with_agent(
             system_prompt=agent.system_prompt,
             conversation_history=conversation_history,
@@ -103,6 +119,12 @@ def send_message(agent_id):
         }), 200
 
     except Exception as e:
+        # Check if it's an authentication error
+        error_str = str(e)
+        if 'authentication_error' in error_str or 'invalid x-api-key' in error_str:
+            # Clear invalid API key from session
+            session.pop('anthropic_api_key', None)
+            return jsonify({'error': 'Invalid Anthropic API key. Please check your key and try again.', 'require_api_key': True}), 401
         return jsonify({'error': str(e)}), 500
 
 

@@ -102,6 +102,53 @@
     .loading.active {
         display: block;
     }
+
+    .api-key-section {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .api-key-section h3 {
+        margin-top: 0;
+        color: #856404;
+    }
+
+    .api-key-input-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .api-key-input-group input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: monospace;
+    }
+
+    .api-key-section p {
+        margin: 10px 0;
+        color: #856404;
+    }
+
+    .api-key-section small {
+        display: block;
+        margin-top: 10px;
+        color: #666;
+    }
+
+    .api-key-section .help-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .api-key-section .help-link:hover {
+        text-decoration: underline;
+    }
 </style>
 {% endblock %}
 
@@ -110,6 +157,25 @@
     <div class="chat-header">
         <h1>{{ agent.name }}</h1>
         <p>{{ agent.description }}</p>
+    </div>
+
+    <div class="api-key-section" id="apiKeySection">
+        <h3>🔑 Anthropic API Key Required</h3>
+        <p>To chat with this agent, you need your own Anthropic API key. Your key accesses Claude's AI - you pay for your usage (~$0.003 per message).</p>
+        <div class="api-key-input-group">
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+            <button id="saveApiKey" class="btn btn-primary">Use Key</button>
+        </div>
+        <div style="margin-top: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: #666; cursor: pointer;">
+                <input type="checkbox" id="rememberKey" checked />
+                <span>Remember key for this session (encrypted, cleared on logout)</span>
+            </label>
+        </div>
+        <small>
+            Don't have an API key? <a href="https://console.anthropic.com/settings/keys" target="_blank" class="help-link">Get one from Anthropic →</a>
+            <br><strong>Security:</strong> If "Remember" is checked, your key is encrypted and stored in your session cookie. If unchecked, you'll enter it each time (most secure).
+        </small>
     </div>
 
     <div class="chat-actions">
@@ -140,6 +206,14 @@
     const sendButton = document.getElementById('sendMessage');
     const clearButton = document.getElementById('clearChat');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const apiKeySection = document.getElementById('apiKeySection');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveApiKeyButton = document.getElementById('saveApiKey');
+    const rememberKeyCheckbox = document.getElementById('rememberKey');
+
+    // Store API key temporarily in memory (for non-remembered keys)
+    let tempApiKey = null;
+    let apiKeyRemembered = false;
 
     // Add message to chat
     function addMessage(role, content) {
@@ -162,10 +236,48 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // Save/Use API key
+    function saveApiKey() {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            alert('Please enter your Anthropic API key');
+            return;
+        }
+
+        if (!apiKey.startsWith('sk-ant-')) {
+            alert('Invalid API key format. Anthropic keys start with "sk-ant-"');
+            return;
+        }
+
+        // Store based on remember checkbox
+        if (rememberKeyCheckbox.checked) {
+            // Will be saved in session on first message
+            tempApiKey = apiKey;
+            apiKeyRemembered = true;
+        } else {
+            // Only in memory for this session
+            tempApiKey = apiKey;
+            apiKeyRemembered = false;
+        }
+
+        // Hide API key section
+        apiKeySection.style.display = 'none';
+
+        // Show welcome message
+        addMessage('assistant', `Hello! I'm ${document.querySelector('.chat-header h1').textContent}. How can I help you today?`);
+    }
+
     // Send message
     async function sendMessage() {
         const message = messageInput.value.trim();
         if (!message) return;
+
+        // Check if API key is available
+        if (!tempApiKey) {
+            apiKeySection.style.display = 'block';
+            alert('Please enter your Anthropic API key first');
+            return;
+        }
 
         // Add user message to chat
         addMessage('user', message);
@@ -174,12 +286,21 @@
         loadingIndicator.classList.add('active');
 
         try {
+            // Send message with API key (only if remembering)
+            const requestBody = { message: message };
+            if (apiKeyRemembered) {
+                requestBody.api_key = tempApiKey;
+            } else {
+                // Send API key with every request but don't save
+                requestBody.api_key = tempApiKey;
+            }
+
             const response = await fetch(`/chat/agent/${agentId}/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
@@ -187,7 +308,14 @@
             if (response.ok) {
                 addMessage('assistant', data.response);
             } else {
-                alert('Error: ' + data.error);
+                // Check if API key is required
+                if (data.require_api_key) {
+                    tempApiKey = null;
+                    apiKeySection.style.display = 'block';
+                    alert('API key error: ' + data.error);
+                } else {
+                    alert('Error: ' + data.error);
+                }
             }
         } catch (error) {
             alert('Failed to send message: ' + error);
@@ -221,6 +349,7 @@
     // Event listeners
     sendButton.addEventListener('click', sendMessage);
     clearButton.addEventListener('click', clearChat);
+    saveApiKeyButton.addEventListener('click', saveApiKey);
 
     messageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -229,7 +358,14 @@
         }
     });
 
-    // Add welcome message
-    addMessage('assistant', `Hello! I'm ${document.querySelector('.chat-header h1').textContent}. How can I help you today?`);
+    apiKeyInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveApiKey();
+        }
+    });
+
+    // Focus on API key input on load
+    apiKeyInput.focus();
 </script>
 {% endblock %}
