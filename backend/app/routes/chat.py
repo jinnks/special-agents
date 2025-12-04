@@ -7,7 +7,7 @@ Chat routes for interacting with AI agents
 from flask import Blueprint, render_template, request, jsonify, session
 from flask_login import login_required, current_user
 from app.models import Agent, Purchase
-from app.claude_service import ClaudeService
+from app.llm_service import LLMService
 
 bp = Blueprint('chat', __name__, url_prefix='/chat')
 
@@ -91,9 +91,12 @@ def send_message(agent_id):
     conversation_history = session.get(session_key, [])
 
     try:
-        # Call Claude API with user's API key
-        claude_service = ClaudeService(api_key=api_key)
-        result = claude_service.chat_with_agent(
+        # Determine LLM provider (use agent's preference or detect from API key)
+        llm_provider = agent.llm_provider if hasattr(agent, 'llm_provider') and agent.llm_provider else 'anthropic'
+
+        # Initialize LLM service with provider
+        llm_service = LLMService(provider=llm_provider, api_key=api_key)
+        result = llm_service.chat(
             system_prompt=agent.system_prompt,
             conversation_history=conversation_history,
             user_message=user_message
@@ -115,16 +118,17 @@ def send_message(agent_id):
         return jsonify({
             'response': result['response'],
             'model': result['model'],
-            'usage': result['usage']
+            'usage': result['usage'],
+            'provider': result['provider']
         }), 200
 
     except Exception as e:
         # Check if it's an authentication error
         error_str = str(e)
-        if 'authentication_error' in error_str or 'invalid x-api-key' in error_str:
+        if 'authentication' in error_str.lower() or ('invalid' in error_str.lower() and 'key' in error_str.lower()):
             # Clear invalid API key from session
             session.pop('anthropic_api_key', None)
-            return jsonify({'error': 'Invalid Anthropic API key. Please check your key and try again.', 'require_api_key': True}), 401
+            return jsonify({'error': f'Invalid API key. Please check your {LLMService.get_provider_name(llm_provider)} API key and try again.', 'require_api_key': True}), 401
         return jsonify({'error': str(e)}), 500
 
 

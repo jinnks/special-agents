@@ -160,10 +160,10 @@
     </div>
 
     <div class="api-key-section" id="apiKeySection">
-        <h3>🔑 Anthropic API Key Required</h3>
-        <p>To chat with this agent, you need your own Anthropic API key. Your key accesses Claude's AI - you pay for your usage (~$0.003 per message).</p>
+        <h3 id="apiKeyTitle">🔑 API Key Required</h3>
+        <p id="apiKeyDescription">To chat with this agent, you need your own API key. You pay for your usage.</p>
         <div class="api-key-input-group">
-            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+            <input type="password" id="apiKeyInput" placeholder="Enter your API key..." />
             <button id="saveApiKey" class="btn btn-primary">Use Key</button>
         </div>
         <div style="margin-top: 10px;">
@@ -172,9 +172,8 @@
                 <span>Remember key for this session (encrypted, cleared on logout)</span>
             </label>
         </div>
-        <small>
-            Don't have an API key? <a href="https://console.anthropic.com/settings/keys" target="_blank" class="help-link">Get one from Anthropic →</a>
-            <br><strong>Security:</strong> If "Remember" is checked, your key is encrypted and stored in your session cookie. If unchecked, you'll enter it each time (most secure).
+        <small id="apiKeyHelp">
+            <strong>Security:</strong> If "Remember" is checked, your key is encrypted and stored in your session cookie. If unchecked, you'll enter it each time (most secure).
         </small>
     </div>
 
@@ -201,6 +200,7 @@
 {% block extra_js %}
 <script>
     const agentId = {{ agent.id }};
+    const llmProvider = '{{ agent.llm_provider if agent.llm_provider else "anthropic" }}';
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendMessage');
@@ -214,6 +214,38 @@
     // Store API key temporarily in memory (for non-remembered keys)
     let tempApiKey = null;
     let apiKeyRemembered = false;
+
+    // Configure API key prompt based on LLM provider
+    const llmConfig = {
+        'anthropic': {
+            name: 'Anthropic Claude',
+            keyPrefix: 'sk-ant-',
+            placeholder: 'sk-ant-api03-...',
+            getKeyUrl: 'https://console.anthropic.com/settings/keys',
+            cost: '$0.003'
+        },
+        'openai': {
+            name: 'OpenAI GPT',
+            keyPrefix: 'sk-',
+            placeholder: 'sk-...',
+            getKeyUrl: 'https://platform.openai.com/api-keys',
+            cost: '$0.002'
+        }
+    };
+
+    const currentLLM = llmConfig[llmProvider] || llmConfig['anthropic'];
+
+    // Update UI with provider-specific info
+    document.getElementById('apiKeyTitle').textContent = `🔑 ${currentLLM.name} API Key Required`;
+    document.getElementById('apiKeyDescription').textContent = `This agent uses ${currentLLM.name}. You need your own API key (~${currentLLM.cost} per message).`;
+    apiKeyInput.placeholder = currentLLM.placeholder;
+
+    // Add provider-specific help link
+    const helpHTML = `
+        Don't have an API key? <a href="${currentLLM.getKeyUrl}" target="_blank" class="help-link">Get one from ${currentLLM.name.split(' ')[0]} →</a>
+        <br><strong>Security:</strong> If "Remember" is checked, your key is encrypted and stored in your session cookie. If unchecked, you'll enter it each time (most secure).
+    `;
+    document.getElementById('apiKeyHelp').innerHTML = helpHTML;
 
     // Add message to chat
     function addMessage(role, content) {
@@ -240,12 +272,16 @@
     function saveApiKey() {
         const apiKey = apiKeyInput.value.trim();
         if (!apiKey) {
-            alert('Please enter your Anthropic API key');
+            alert(`Please enter your ${currentLLM.name} API key`);
             return;
         }
 
-        if (!apiKey.startsWith('sk-ant-')) {
+        // Validate API key format based on provider
+        if (llmProvider === 'anthropic' && !apiKey.startsWith('sk-ant-')) {
             alert('Invalid API key format. Anthropic keys start with "sk-ant-"');
+            return;
+        } else if (llmProvider === 'openai' && !apiKey.startsWith('sk-') || apiKey.startsWith('sk-ant-')) {
+            alert('Invalid API key format. OpenAI keys start with "sk-" (but not "sk-ant-")');
             return;
         }
 

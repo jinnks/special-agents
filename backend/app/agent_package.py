@@ -167,6 +167,18 @@ class AgentPackageValidator:
             else:
                 metadata[field] = meta[field]
 
+        # Optional llm_provider field
+        if 'llm_provider' in meta:
+            llm_provider = meta['llm_provider'].lower()
+            if llm_provider not in ['anthropic', 'openai']:
+                self.errors.append(f"Invalid llm_provider. Must be 'anthropic' or 'openai'")
+            else:
+                metadata['llm_provider'] = llm_provider
+        else:
+            # Default to anthropic if not specified
+            metadata['llm_provider'] = 'anthropic'
+            self.warnings.append("No llm_provider specified - defaulting to 'anthropic'")
+
         # Validate specific fields
         if 'name' in meta:
             name = meta['name']

@@ -57,6 +57,7 @@ class Agent(db.Model):
     # Agent configuration
     system_prompt = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(100), nullable=False, index=True)
+    llm_provider = db.Column(db.String(50), nullable=False, default='anthropic')  # 'anthropic', 'openai', etc.
 
     # Package information
     has_package = db.Column(db.Boolean, default=False)  # True if uploaded as .sagent package

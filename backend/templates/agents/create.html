@@ -28,6 +28,15 @@
             </div>
 
             <div class="form-group">
+                <label for="llm_provider">LLM Provider *</label>
+                <select id="llm_provider" name="llm_provider" required>
+                    <option value="anthropic" selected>Anthropic Claude (claude-3-5-sonnet)</option>
+                    <option value="openai">OpenAI GPT (gpt-4o)</option>
+                </select>
+                <small>Choose which AI model powers your agent. Users will need an API key for the selected provider.</small>
+            </div>
+
+            <div class="form-group">
                 <label for="description">Description *</label>
                 <textarea id="description" name="description" rows="4" required placeholder="Describe what your agent does and how it helps users..."></textarea>
             </div>

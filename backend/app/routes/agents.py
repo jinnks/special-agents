@@ -121,12 +121,17 @@ def create():
         system_prompt = data.get('system_prompt')
         category = data.get('category')
         price = float(data.get('price', 0))
+        llm_provider = data.get('llm_provider', 'anthropic')
 
         if not name or not description or not system_prompt or not category:
             if request.is_json:
                 return jsonify({'error': 'Missing required fields'}), 400
             flash('All fields are required', 'error')
             return redirect(url_for('agents.create'))
+
+        # Validate llm_provider
+        if llm_provider not in ['anthropic', 'openai']:
+            llm_provider = 'anthropic'
 
         # Create agent
         agent = Agent(
@@ -135,6 +140,7 @@ def create():
             system_prompt=system_prompt,
             category=category,
             price=price,
+            llm_provider=llm_provider,
             creator_id=current_user.id,
             is_approved=False  # Requires ethical review
         )
@@ -364,6 +370,7 @@ def upload_package():
                     category=metadata['category'],
                     price=float(metadata['price']),
                     currency=metadata['currency'],
+                    llm_provider=metadata.get('llm_provider', 'anthropic'),
                     creator_id=current_user.id,
                     has_package=True,
                     package_version=metadata.get('version', '1.0.0'),
