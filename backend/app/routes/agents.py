@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
 from app import db
-from app.models import Agent, Purchase, Review
+from app.models import Agent, Purchase, Review, AgentConfig, AgentPricing, AgentStats, AgentPackage
 from app.agent_package import AgentPackageValidator, AgentPackageExtractor
 from sqlalchemy import func
 
@@ -39,7 +39,11 @@ def marketplace():
             (Agent.description.ilike(f'%{search}%'))
         )
 
-    agents = query.order_by(Agent.average_rating.desc(), Agent.purchase_count.desc()).all()
+    # Order by stats (join with AgentStats table)
+    agents = query.join(AgentStats, Agent.id == AgentStats.agent_id, isouter=True).order_by(
+        AgentStats.average_rating.desc().nullslast(),
+        AgentStats.purchase_count.desc().nullslast()
+    ).all()
 
     if request.is_json:
         return jsonify({
@@ -48,10 +52,10 @@ def marketplace():
                 'name': agent.name,
                 'description': agent.description,
                 'category': agent.category,
-                'price': agent.price,
-                'currency': agent.currency,
-                'average_rating': agent.average_rating,
-                'purchase_count': agent.purchase_count,
+                'price': agent.pricing.price if agent.pricing else 0.0,
+                'currency': agent.pricing.currency if agent.pricing else 'USD',
+                'average_rating': agent.stats.average_rating if agent.stats else 0.0,
+                'purchase_count': agent.stats.purchase_count if agent.stats else 0,
                 'creator': agent.creator.username
             } for agent in agents]
         }), 200
@@ -85,10 +89,10 @@ def detail(agent_id):
                 'name': agent.name,
                 'description': agent.description,
                 'category': agent.category,
-                'price': agent.price,
-                'currency': agent.currency,
-                'average_rating': agent.average_rating,
-                'purchase_count': agent.purchase_count,
+                'price': agent.pricing.price if agent.pricing else 0.0,
+                'currency': agent.pricing.currency if agent.pricing else 'USD',
+                'average_rating': agent.stats.average_rating if agent.stats else 0.0,
+                'purchase_count': agent.stats.purchase_count if agent.stats else 0,
                 'creator': agent.creator.username,
                 'created_at': agent.created_at.isoformat()
             },
@@ -133,18 +137,41 @@ def create():
         if llm_provider not in ['anthropic', 'openai']:
             llm_provider = 'anthropic'
 
-        # Create agent
+        # Create agent (core info)
         agent = Agent(
             name=name,
             description=description,
-            system_prompt=system_prompt,
             category=category,
-            price=price,
-            llm_provider=llm_provider,
             creator_id=current_user.id,
             is_approved=False  # Requires ethical review
         )
         db.session.add(agent)
+        db.session.flush()  # Get agent.id for related records
+
+        # Create agent config (AI settings)
+        agent_config = AgentConfig(
+            agent_id=agent.id,
+            system_prompt=system_prompt,
+            llm_provider=llm_provider
+        )
+        db.session.add(agent_config)
+
+        # Create agent pricing
+        agent_pricing = AgentPricing(
+            agent_id=agent.id,
+            price=price,
+            currency='USD'
+        )
+        db.session.add(agent_pricing)
+
+        # Create agent stats
+        agent_stats = AgentStats(
+            agent_id=agent.id,
+            purchase_count=0,
+            average_rating=0.0
+        )
+        db.session.add(agent_stats)
+
         db.session.commit()
 
         if request.is_json:
@@ -182,13 +209,14 @@ def purchase(agent_id):
     purchase = Purchase(
         buyer_id=current_user.id,
         agent_id=agent_id,
-        price_paid=agent.price,
-        currency=agent.currency
+        price_paid=agent.pricing.price if agent.pricing else 0.0,
+        currency=agent.pricing.currency if agent.pricing else 'USD'
     )
     db.session.add(purchase)
 
     # Update agent stats
-    agent.purchase_count += 1
+    if agent.stats:
+        agent.stats.purchase_count += 1
     db.session.commit()
 
     if request.is_json:
@@ -254,7 +282,8 @@ def add_review(agent_id):
         agent_id=agent_id,
         is_visible=True
     ).scalar()
-    agent.average_rating = round(avg_rating, 2) if avg_rating else 0.0
+    if agent.stats:
+        agent.stats.average_rating = round(avg_rating, 2) if avg_rating else 0.0
     db.session.commit()
 
     if request.is_json:
@@ -283,11 +312,11 @@ def my_agents():
                 'name': agent.name,
                 'description': agent.description,
                 'category': agent.category,
-                'price': agent.price,
+                'price': agent.pricing.price if agent.pricing else 0.0,
                 'is_approved': agent.is_approved,
                 'is_active': agent.is_active,
-                'purchase_count': agent.purchase_count,
-                'average_rating': agent.average_rating
+                'purchase_count': agent.stats.purchase_count if agent.stats else 0,
+                'average_rating': agent.stats.average_rating if agent.stats else 0.0
             } for agent in agents]
         }), 200
 
@@ -362,27 +391,53 @@ def upload_package():
                 # Extract metadata
                 metadata = result['metadata']
 
-                # Create agent from package
+                # Create agent (core info)
                 agent = Agent(
                     name=metadata['name'],
                     description=metadata['description'],
-                    system_prompt=metadata['system_prompt'],
                     category=metadata['category'],
-                    price=float(metadata['price']),
-                    currency=metadata['currency'],
-                    llm_provider=metadata.get('llm_provider', 'anthropic'),
                     creator_id=current_user.id,
-                    has_package=True,
-                    package_version=metadata.get('version', '1.0.0'),
                     is_approved=False  # Requires ethical review
                 )
                 db.session.add(agent)
-                db.session.flush()  # Get agent ID
+                db.session.flush()  # Get agent ID for related records
+
+                # Create agent config (AI settings)
+                agent_config = AgentConfig(
+                    agent_id=agent.id,
+                    system_prompt=metadata['system_prompt'],
+                    llm_provider=metadata.get('llm_provider', 'anthropic')
+                )
+                db.session.add(agent_config)
+
+                # Create agent pricing
+                agent_pricing = AgentPricing(
+                    agent_id=agent.id,
+                    price=float(metadata['price']),
+                    currency=metadata['currency']
+                )
+                db.session.add(agent_pricing)
+
+                # Create agent stats
+                agent_stats = AgentStats(
+                    agent_id=agent.id,
+                    purchase_count=0,
+                    average_rating=0.0
+                )
+                db.session.add(agent_stats)
 
                 # Extract package to permanent location
                 extractor = AgentPackageExtractor(upload_folder)
                 package_path = extractor.extract_package(temp_path, agent.id)
-                agent.package_path = package_path
+
+                # Create agent package record
+                agent_package = AgentPackage(
+                    agent_id=agent.id,
+                    has_package=True,
+                    version=metadata.get('version', '1.0.0'),
+                    file_path=package_path
+                )
+                db.session.add(agent_package)
 
                 db.session.commit()
 

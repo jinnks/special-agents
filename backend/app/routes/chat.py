@@ -91,13 +91,17 @@ def send_message(agent_id):
     conversation_history = session.get(session_key, [])
 
     try:
-        # Determine LLM provider (use agent's preference or detect from API key)
-        llm_provider = agent.llm_provider if hasattr(agent, 'llm_provider') and agent.llm_provider else 'anthropic'
+        # Get agent config (ensure it exists)
+        if not agent.config:
+            return jsonify({'error': 'Agent configuration not found'}), 500
+
+        # Determine LLM provider (use agent's preference or default to anthropic)
+        llm_provider = agent.config.llm_provider if agent.config.llm_provider else 'anthropic'
 
         # Initialize LLM service with provider
         llm_service = LLMService(provider=llm_provider, api_key=api_key)
         result = llm_service.chat(
-            system_prompt=agent.system_prompt,
+            system_prompt=agent.config.system_prompt,
             conversation_history=conversation_history,
             user_message=user_message
         )
