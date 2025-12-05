@@ -14,9 +14,13 @@ from sqlalchemy import inspect, text
 
 def column_exists(table_name, column_name):
     """Check if a column exists in a table"""
-    inspector = inspect(db.engine)
-    columns = [col['name'] for col in inspector.get_columns(table_name)]
-    return column_name in columns
+    try:
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns(table_name)]
+        return column_name in columns
+    except Exception:
+        # Table doesn't exist yet
+        return False
 
 def migrate():
     """Add llm_provider column to agent table"""
@@ -24,6 +28,14 @@ def migrate():
 
     with app.app_context():
         try:
+            # Check if table exists
+            inspector = inspect(db.engine)
+            tables = inspector.get_table_names()
+
+            if 'agent' not in tables:
+                print("✓ Table 'agent' doesn't exist yet - will be created by db.create_all()")
+                return True
+
             # Check if column already exists
             if column_exists('agent', 'llm_provider'):
                 print("✓ Column 'llm_provider' already exists in 'agent' table")
