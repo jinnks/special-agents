@@ -49,10 +49,11 @@ def migrate():
                     if table in existing_tables:
                         print(f"  Dropping {table}...")
                         if is_postgres:
-                            db.session.execute(text(f'DROP TABLE IF EXISTS {table} CASCADE'))
+                            # Quote table names for PostgreSQL (handles reserved keywords like "user")
+                            db.session.execute(text(f'DROP TABLE IF EXISTS "{table}" CASCADE'))
                         else:
                             # SQLite doesn't support CASCADE
-                            db.session.execute(text(f'DROP TABLE IF EXISTS {table}'))
+                            db.session.execute(text(f'DROP TABLE IF EXISTS "{table}"'))
 
                 db.session.commit()
                 print("✓ Old tables dropped")
