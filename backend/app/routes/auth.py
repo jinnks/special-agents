@@ -6,13 +6,15 @@ Authentication routes for user registration and login
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db
+from app import db, limiter
 from app.models import User
+from app.security import InputValidator
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per hour")  # Prevent registration spam
 def register():
     """User registration."""
     if current_user.is_authenticated:
@@ -21,18 +23,35 @@ def register():
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
 
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
+        username = InputValidator.sanitize_text(data.get('username', ''), max_length=80)
+        email = InputValidator.sanitize_text(data.get('email', ''), max_length=120)
+        password = data.get('password', '')  # Don't sanitize passwords
         # Convert string 'true'/'false' to boolean
         is_seller_raw = data.get('is_seller', False)
         is_seller = is_seller_raw in ['true', 'True', True, 1, '1']
 
-        # Validation
-        if not username or not email or not password:
+        # Validate username
+        valid, error = InputValidator.validate_username(username)
+        if not valid:
             if request.is_json:
-                return jsonify({'error': 'Missing required fields'}), 400
-            flash('All fields are required', 'error')
+                return jsonify({'error': error}), 400
+            flash(error, 'error')
+            return redirect(url_for('auth.register'))
+
+        # Validate email
+        valid, error = InputValidator.validate_email_address(email)
+        if not valid:
+            if request.is_json:
+                return jsonify({'error': error}), 400
+            flash(error, 'error')
+            return redirect(url_for('auth.register'))
+
+        # Validate password
+        valid, error = InputValidator.validate_password(password)
+        if not valid:
+            if request.is_json:
+                return jsonify({'error': error}), 400
+            flash(error, 'error')
             return redirect(url_for('auth.register'))
 
         # Check if user exists
@@ -66,6 +85,7 @@ def register():
 
 
 @bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per hour")  # Prevent brute force attacks
 def login():
     """User login."""
     if current_user.is_authenticated:
@@ -74,8 +94,8 @@ def login():
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
 
-        username = data.get('username')
-        password = data.get('password')
+        username = InputValidator.sanitize_text(data.get('username', ''), max_length=80)
+        password = data.get('password', '')  # Don't sanitize passwords
 
         user = User.query.filter_by(username=username).first()
 
