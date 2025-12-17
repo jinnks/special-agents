@@ -121,11 +121,12 @@ def create_app():
     login_manager.session_protection = 'strong'  # Protect against session fixation
 
     # Register blueprints
-    from app.routes import main, auth, agents, chat
+    from app.routes import main, auth, agents, chat, agent_creator
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(agents.bp)
     app.register_blueprint(chat.bp)
+    app.register_blueprint(agent_creator.bp)
 
     # Health check endpoint (for monitoring)
     @app.route('/health')

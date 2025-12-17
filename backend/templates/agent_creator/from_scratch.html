@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Create Agent from Scratch{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{{ url_for('agent_creator.choose_mode') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+            ← Back to mode selection
+        </a>
+        <h1 class="text-3xl font-bold mb-2">Create Your Agent</h1>
+        <p class="text-gray-600">Fill in the details below. We'll guide you through each step!</p>
+    </div>
+
+    <form method="POST" class="space-y-8">
+        <!-- Basic Information -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">1</span>
+                Basic Information
+            </h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Agent Name *</label>
+                    <input type="text" name="name" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           placeholder="e.g., My Helpful Assistant"
+                           minlength="3" maxlength="200">
+                    <p class="text-xs text-gray-500 mt-1">Choose a clear, descriptive name (3-200 characters)</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Category *</label>
+                    <select name="category" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Select a category --</option>
+                        <option value="business">Business & Productivity</option>
+                        <option value="education">Education & Learning</option>
+                        <option value="creative">Creative & Writing</option>
+                        <option value="development">Development & Tech</option>
+                        <option value="health">Health & Wellness</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Short Description *</label>
+                    <textarea name="description" required
+                              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                              rows="3"
+                              placeholder="Describe what your agent does and who it's for..."
+                              minlength="20" maxlength="2000"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Help users understand what your agent can do (20-2000 characters)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Behavior -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">2</span>
+                How Should Your Agent Behave?
+            </h2>
+
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                <p class="text-sm text-gray-700">
+                    <strong>💡 Tip:</strong> Describe the agent's personality, tone, and how it should respond.
+                    Be specific about what it should and shouldn't do.
+                </p>
+                <details class="mt-2">
+                    <summary class="text-sm font-medium text-blue-700 cursor-pointer">Show example</summary>
+                    <pre class="mt-2 text-xs bg-white p-3 rounded border overflow-x-auto">You are a friendly customer support agent for a tech company.
+
+Your role:
+- Answer questions clearly and patiently
+- Be empathetic and understanding
+- Escalate complex technical issues
+- Always maintain a positive tone
+
+Guidelines:
+- Greet customers warmly
+- Ask clarifying questions if needed
+- Provide step-by-step solutions
+- End with "Is there anything else I can help with?"</pre>
+                </details>
+            </div>
+
+            <textarea name="system_prompt" required
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                      rows="12"
+                      placeholder="You are a helpful assistant that...&#10;&#10;Your role:&#10;- Help users with...&#10;- Provide...&#10;&#10;Your tone:&#10;- Friendly and professional&#10;- Clear and concise"
+                      minlength="50" maxlength="5000"></textarea>
+            <p class="text-xs text-gray-500 mt-1">Minimum 50 characters. Be detailed - this is the brain of your agent!</p>
+        </div>
+
+        <!-- Example Conversations (Optional) -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">3</span>
+                Example Conversations
+                <span class="ml-2 text-sm font-normal text-gray-500">(Optional but recommended)</span>
+            </h2>
+
+            <p class="text-sm text-gray-600 mb-4">
+                Show potential users how your agent responds. Add up to 3 examples.
+            </p>
+
+            <div class="space-y-6">
+                <div class="border-l-4 border-blue-200 pl-4">
+                    <label class="block text-sm font-medium mb-2">Example 1</label>
+                    <input type="text" name="example_user_1"
+                           class="w-full px-4 py-2 border rounded-lg mb-2"
+                           placeholder="User: How do I reset my password?">
+                    <textarea name="example_agent_1"
+                              class="w-full px-4 py-2 border rounded-lg"
+                              rows="2"
+                              placeholder="Agent: I'd be happy to help! Click 'Forgot Password' on the login page..."></textarea>
+                </div>
+
+                <div class="border-l-4 border-blue-200 pl-4">
+                    <label class="block text-sm font-medium mb-2">Example 2</label>
+                    <input type="text" name="example_user_2"
+                           class="w-full px-4 py-2 border rounded-lg mb-2"
+                           placeholder="User: What are your business hours?">
+                    <textarea name="example_agent_2"
+                              class="w-full px-4 py-2 border rounded-lg"
+                              rows="2"
+                              placeholder="Agent: We're open Monday-Friday, 9am-5pm EST..."></textarea>
+                </div>
+
+                <div class="border-l-4 border-blue-200 pl-4">
+                    <label class="block text-sm font-medium mb-2">Example 3</label>
+                    <input type="text" name="example_user_3"
+                           class="w-full px-4 py-2 border rounded-lg mb-2"
+                           placeholder="User: Can you help me with...">
+                    <textarea name="example_agent_3"
+                              class="w-full px-4 py-2 border rounded-lg"
+                              rows="2"
+                              placeholder="Agent: Of course! Let me explain..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing & Settings -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">4</span>
+                Pricing & Settings
+            </h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">AI Provider *</label>
+                    <select name="llm_provider" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="anthropic">Anthropic Claude (Recommended)</option>
+                        <option value="openai">OpenAI GPT</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">The AI model that powers your agent</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Price (USD) *</label>
+                    <input type="number" name="price" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           min="0" max="9999" step="0.01" value="9.99">
+                    <p class="text-xs text-gray-500 mt-1">One-time purchase price ($0.00 - $9,999.99)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex items-center justify-between">
+            <a href="{{ url_for('agent_creator.choose_mode') }}"
+               class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Cancel
+            </a>
+            <button type="submit"
+                    class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                Create Agent →
+            </button>
+        </div>
+
+        <p class="text-xs text-gray-500 text-center">
+            Your agent will be submitted for approval. You'll be notified when it's live on the marketplace.
+        </p>
+    </form>
+</div>
+{% endblock %}

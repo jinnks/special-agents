@@ -4,7 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Special Agents - Ethical AI Marketplace{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        .nav-links .btn-primary {
+            background: white;
+            color: #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+        .nav-links .btn-primary:hover {
+            opacity: 1;
+            background: #f0f0f0;
+        }
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+        .footer a {
+            color: #90cdf4;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -17,7 +95,7 @@
                     <li><a href="{{ url_for('agents.my_purchases') }}">My Agents</a></li>
                     {% if current_user.is_seller %}
                         <li><a href="{{ url_for('agents.my_agents') }}">My Created Agents</a></li>
-                        <li><a href="{{ url_for('agents.upload_package') }}">Upload Package</a></li>
+                        <li><a href="{{ url_for('agent_creator.choose_mode') }}" class="btn-primary">Create Agent</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a></li>
                 {% else %}

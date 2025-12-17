@@ -90,6 +90,11 @@ class AgentConfig(db.Model):
     system_prompt = db.Column(db.Text, nullable=False)
     llm_provider = db.Column(db.String(50), nullable=False, default='anthropic')  # 'anthropic', 'openai', etc.
 
+    # Creation tracking
+    creation_mode = db.Column(db.String(20), default='web_form')  # 'web_form', 'template', 'package', 'ai_assistant'
+    template_id = db.Column(db.String(50))  # If created from template, which one
+    example_conversations = db.Column(db.Text)  # JSON array of example interactions
+
     # Moderation
     approval_notes = db.Column(db.Text)
 
