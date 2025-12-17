@@ -21,6 +21,21 @@ def migrate():
     with app.app_context():
         print("🔄 Adding creation mode and example conversation support...")
 
+        # Check if columns already exist
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+
+        try:
+            columns = inspector.get_columns('agent_config')
+            column_names = [col['name'] for col in columns]
+
+            if 'creation_mode' in column_names:
+                print("✅ Creation mode fields already exist - skipping migration")
+                return
+
+        except Exception:
+            print("⚠️  Could not check existing columns, proceeding with migration...")
+
         # Detect database type
         engine_name = db.engine.name
         is_postgres = engine_name == 'postgresql'

@@ -25,6 +25,16 @@ def migrate():
             print("Schema Migration v2: Normalized Database")
             print("=" * 60)
 
+            # Check if already migrated to new schema
+            has_singular_tables = 'agent' in existing_tables and 'user' in existing_tables
+            has_plural_tables = 'agents' in existing_tables or 'users' in existing_tables
+
+            if has_singular_tables and not has_plural_tables:
+                print("\n✓ Database already migrated to new schema (singular table names)")
+                print("✓ Skipping migration - tables are up to date")
+                print("=" * 60)
+                return
+
             if existing_tables:
                 print(f"\nFound {len(existing_tables)} existing tables:")
                 for table in existing_tables:
