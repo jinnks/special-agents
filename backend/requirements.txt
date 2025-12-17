@@ -38,3 +38,11 @@ cryptography==42.0.0
 
 # Production Monitoring
 python-json-logger==2.0.7
+
+# Testing & Coverage
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-flask==1.3.0
+coverage==7.3.4
+faker==22.0.0
